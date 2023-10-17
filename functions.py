@@ -1,3 +1,5 @@
+import numpy as np
+
 def compute_mse(y, tx, w):
     """compute the loss with MSE.
     Args:
@@ -32,7 +34,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         gradient = compute_gradient_mse(y, tx, w)
         loss = compute_mse(y, tx, w)
         w = w - gamma * gradient
-        print("Gradient Descent({bi}/{ti}): loss={l}".format(
+    print("Gradient Descent({bi}/{ti}): loss={l}".format(
             bi=n_iter, ti=max_iters - 1, l=loss))
     return loss, w
 
@@ -133,6 +135,7 @@ def build_poly(x, degree):
     """
     poly_x = np.zeros((len(x), degree+1))
     for i, z in enumerate(x):
+        print(z)
         for j in range(degree+1):
             poly_x[i,j] = z**j
 
