@@ -135,7 +135,6 @@ def build_poly(x, degree):
     """
     poly_x = np.zeros((len(x), degree+1))
     for i, z in enumerate(x):
-        print(z)
         for j in range(degree+1):
             poly_x[i,j] = z**j
 
