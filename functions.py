@@ -38,6 +38,14 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
             bi=n_iter, ti=max_iters - 1, l=loss))
     return loss, w
 
+def standardize(x):
+    """Standardize the original data set."""
+    mean_x = np.mean(x, axis=0)
+    x = x - mean_x
+    std_x = np.std(x, axis=0)
+    x = x / std_x
+    return x, mean_x, std_x
+
 def compute_y_test(x_test, w):
     """compute the output vector y_test"""
     x_test_std = standardize(x_test)[0]
