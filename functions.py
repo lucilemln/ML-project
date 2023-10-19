@@ -103,11 +103,11 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
             ws.append(w)
             losses.append(loss)
 
-        print(
-            "SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-                bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]
-            )
+    print(
+        "SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+            bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]
         )
+    )
     return loss, w
 
 def least_squares(y, tx):
@@ -127,61 +127,46 @@ def ridge_regression(y, tx, lambda_):
     loss = compute_mse(y, tx, w)
     return loss, w
 
-def build_poly(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree.
 
-    Args:
-        x: numpy array of shape (N,), N is the number of samples.
-        degree: integer.
+def polynomial_least_squares(X, y, degree):
+    """
+    Fit a least squares polynomial regression model to the data.
+
+    Parameters:
+    - X: Training feature matrix as a 2D NumPy array (shape: [n_samples, n_features]).
+    - y: Target variable as a 1D NumPy array (shape: [n_samples]).
+    - degree: Degree of the polynomial regression.
 
     Returns:
-        poly: numpy array of shape (N,d+1)
-
-    >>> build_poly(np.array([0.0, 1.5]), 2)
-    array([[1.  , 0.  , 0.  ],
-           [1.  , 1.5 , 2.25]])
+    - model: Fitted polynomial regression model.
     """
-    poly_x = np.zeros((len(x), degree+1))
-    for i, z in enumerate(x):
-        for j in range(degree+1):
-            poly_x[i,j] = z**j
-
-    return poly_x
-
-def poly_ridge_ls(y,tx,lambda_=0,ridge_y=False,ls_y = False, degree = 1):
-    if ridge_y == False and ls_y == False:
-        print('no algorithm has been chosen')
-        return
-    elif ridge_y == True and ls_y == True:
-        print('both algorithm have been chosen')
-        return
-        
-    elif ls_y == True and ridge_y == False:
-        tx_poly = build_poly(tx, degree)
-        weights, mse = least_squares(y, tx_poly)
-        rmse = np.sqrt(2*mse)
-        return rmse, weights
     
-    elif ls_y == False and ridge_y == True:
-        tx_poly = build_poly(tx, degree)
-        weights, mse = ridge_regression(y, tx_poly, lambda_)
-        rmse = np.sqrt(2*mse)
-        return rmse, weights
-    
-def compute_loss_logistic(y, tx, w):
-    """compute the cost by negative log likelihood."""
-    pred = tx.dot(w)
-    loss = np.sum(np.log(1 + np.exp(pred))) - y.T.dot(pred)
-    return loss
+    # Generate polynomial features
+    X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
+
+    # Add a column of ones for the intercept term
+    X_poly = np.column_stack([np.ones(X.shape[0]), X_poly])
+
+    # Fit a linear regression model
+    model = np.linalg.lstsq(X_poly, y, rcond=None)[0]
+
+    return model
+
 
 def sigmoid(t):
     """apply sigmoid function on t."""
-    return 1.0 / (1 + np.exp(-t))
+    return np.exp(t)/ (1 + np.exp(t))
+
+def compute_loss_logistic(y, tx, w):
+    """compute the loss for y in [-1, 1]: negative log likelihood."""
+    pred = tx.dot(w)
+    loss = 1/len(y)*np.sum(np.log(1 + np.exp(-y*pred)))
+    return loss
 
 def compute_gradient_logistic(y, tx, w):
     """compute the gradient of loss."""
     pred = tx.dot(w)
-    gradient = tx.T.dot(sigmoid(pred) - y)
+    gradient = tx.T.dot(sigmoid(pred))/len(y)
     return gradient
     
 def logistic_regression(y, x, max_iter, gamma, initial_w):
