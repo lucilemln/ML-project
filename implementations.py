@@ -41,7 +41,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
             loss = compute_mse(y, tx, w)
         print("Gradient Descent({bi}/{ti}): loss={l}".format(
                 bi=n_iter, ti=max_iters, l=loss))
-    return loss, w
+    return w, loss
 
 def standardize(x):
     """Standardize the original data set."""
