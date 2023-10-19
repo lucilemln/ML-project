@@ -97,13 +97,13 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     losses = []
     w = initial_w
 
-    for n_iter in range(max_iters+1):
+    for n_iter in range(max_iters):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=1):
             # compute gradient and loss
-            loss = compute_mse(y_batch, tx_batch, w)
             grad = compute_stoch_gradient(y_batch, tx_batch, w)
-            # update w by gradient
             w = w - gamma * grad
+            loss = compute_mse(y_batch, tx_batch, w)
+            # update w by gradient
             # store w and loss
             losses.append(loss)
 
