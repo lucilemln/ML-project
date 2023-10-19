@@ -7,7 +7,7 @@ def compute_mse(y, tx, w):
         tx: numpy array of shape=(N, D). The input data.
         w: numpy array of shape=(D, ). The weights"""
     e = y - tx.dot(w)
-    mse = e.dot(e)/(2*len(y))
+    mse = 1/(2*len(y)) * e.dot(e)
     return mse
 
 def compute_gradient_mse(y, tx, w):
@@ -32,10 +32,10 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     for n_iter in range(max_iters):
         gradient = compute_gradient_mse(y, tx, w)
-        loss = compute_mse(y, tx, w)
         w = w - gamma * gradient
+        loss = compute_mse(y, tx, w)
     print("Gradient Descent({bi}/{ti}): loss={l}".format(
-            bi=n_iter, ti=max_iters - 1, l=loss))
+            bi=n_iter, ti=max_iters, l=loss))
     return loss, w
 
 def standardize(x):
@@ -87,12 +87,12 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         initial_w = initial weights
         max_iters = maximum number of iterations
         gamma = learning rate"""
-    
-    ws = [initial_w]
+    if max_iters < 1:
+        raise ValueError("max_iters must be greater than 1.")
     losses = []
     w = initial_w
 
-    for n_iter in range(max_iters):
+    for n_iter in range(max_iters+1):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=1):
             # compute gradient and loss
             loss = compute_mse(y_batch, tx_batch, w)
@@ -100,7 +100,6 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
             # update w by gradient
             w = w - gamma * grad
             # store w and loss
-            ws.append(w)
             losses.append(loss)
 
     print(
@@ -155,7 +154,7 @@ def logistic_regression(y, x, max_iter, gamma, initial_w):
         loss = loss of the logistic regression
         w = weights of the logistic regression"""
     w = initial_w
-    for n_iter in range(max_iter):
+    for n_iter in range(max_iter+1):
         loss = compute_loss_logistic(y, x, w)
         gradient = compute_gradient_logistic(y, x, w)
         w = w - gamma * gradient
