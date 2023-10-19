@@ -162,4 +162,24 @@ def logistic_regression(y, x, max_iter, gamma, initial_w):
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
     return loss, w
+
+def reg_logistic_regression(y, x, lambda_, max_iter, gamma, initial_w):
+    """calculate the loss and the weights using regularized logistic regression.
+        Args : 
+        x = input matrix of the training set (N,D) where N is the number of samples and D the number of features
+        y = output vector of the training set(N,) where N is the number of samples
+        max_iter = maximum number of iterations
+        gamma = learning rate
+        initial_w = initial weights
+        return :
+        loss = loss of the logistic regression
+        w = weights of the logistic regression"""
+    w = initial_w
+    for n_iter in range(max_iter):
+        loss = compute_loss_logistic(y, x, w) + lambda_/2*np.linalg.norm(w)**2
+        gradient = compute_gradient_logistic(y, x, w) + lambda_*w
+        w = w - gamma * gradient
+        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+            bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
+    return loss, w
     
