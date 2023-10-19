@@ -127,32 +127,6 @@ def ridge_regression(y, tx, lambda_):
     loss = compute_mse(y, tx, w)
     return loss, w
 
-
-def polynomial_least_squares(X, y, degree):
-    """
-    Fit a least squares polynomial regression model to the data.
-
-    Parameters:
-    - X: Training feature matrix as a 2D NumPy array (shape: [n_samples, n_features]).
-    - y: Target variable as a 1D NumPy array (shape: [n_samples]).
-    - degree: Degree of the polynomial regression.
-
-    Returns:
-    - model: Fitted polynomial regression model.
-    """
-    
-    # Generate polynomial features
-    X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
-
-    # Add a column of ones for the intercept term
-    X_poly = np.column_stack([np.ones(X.shape[0]), X_poly])
-
-    # Fit a linear regression model
-    model = np.linalg.lstsq(X_poly, y, rcond=None)[0]
-
-    return model
-
-
 def sigmoid(t):
     """apply sigmoid function on t."""
     return np.exp(t)/ (1 + np.exp(t))
