@@ -30,12 +30,17 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         gamma = learning rate"""
     
     w = initial_w
-    for n_iter in range(max_iters+1):
-        gradient = compute_gradient_mse(y, tx, w)
-        w = w - gamma * gradient
+    if max_iters < 1:
         loss = compute_mse(y, tx, w)
-    print("Gradient Descent({bi}/{ti}): loss={l}".format(
-            bi=n_iter, ti=max_iters, l=loss))
+        print("Gradient Descent({bi}/{ti}): loss={l}".format(
+                bi=0, ti=0, l=loss))
+    else:
+        for n_iter in range(max_iters):
+            gradient = compute_gradient_mse(y, tx, w)
+            w = w - gamma * gradient
+            loss = compute_mse(y, tx, w)
+        print("Gradient Descent({bi}/{ti}): loss={l}".format(
+                bi=n_iter, ti=max_iters, l=loss))
     return loss, w
 
 def standardize(x):
