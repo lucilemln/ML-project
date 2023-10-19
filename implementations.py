@@ -28,9 +28,9 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         initial_w = initial weights
         max_iters = maximum number of iterations
         gamma = learning rate"""
-        
+    
     w = initial_w
-    for n_iter in range(max_iters):
+    for n_iter in range(max_iters+1):
         gradient = compute_gradient_mse(y, tx, w)
         w = w - gamma * gradient
         loss = compute_mse(y, tx, w)
