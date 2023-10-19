@@ -112,7 +112,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
             bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]
         )
     )
-    return loss, w
+    return w, loss
 
 def least_squares(y, tx):
     """calculate the least squares solution."""
@@ -120,7 +120,7 @@ def least_squares(y, tx):
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
     loss = compute_mse(y, tx, w)
-    return loss, w
+    return w, loss
 
 def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""
@@ -129,7 +129,7 @@ def ridge_regression(y, tx, lambda_):
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
     loss = compute_mse(y, tx, w)
-    return loss, w
+    return w, loss
 
 def sigmoid(t):
     """apply sigmoid function on t."""
@@ -165,7 +165,7 @@ def logistic_regression(y, x, max_iter, gamma, initial_w):
         w = w - gamma * gradient
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
-    return loss, w
+    return w, loss
 
 def reg_logistic_regression(y, x, lambda_, max_iter, gamma, initial_w):
     """calculate the loss and the weights using regularized logistic regression.
@@ -185,5 +185,5 @@ def reg_logistic_regression(y, x, lambda_, max_iter, gamma, initial_w):
         w = w - gamma * gradient
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
-    return loss, w
+    return w, loss
     
