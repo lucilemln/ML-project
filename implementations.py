@@ -179,10 +179,11 @@ def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
         loss = loss of the logistic regression
         w = weights of the logistic regression"""
     w = initial_w
-    for n_iter in range(max_iter):
+    for n_iter in range(max_iter+1):
         gradient = compute_gradient_logistic(y, x, w) + lambda_*w
         w = w - gamma * gradient
-        loss = compute_loss_logistic(y, x, w) + lambda_/2*np.linalg.norm(w)**2
+        loss = compute_loss_logistic(y, x, w)
+
         print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
     return w, loss
