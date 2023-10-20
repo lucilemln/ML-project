@@ -147,7 +147,7 @@ def compute_gradient_logistic(y, tx, w):
     gradient = tx.T.dot(sigmoid(pred))/len(y)
     return gradient
     
-def logistic_regression(y, x, max_iter, gamma, initial_w):
+def logistic_regression(y, x, initial_w, max_iter, gamma):
     """calculate the loss and the weights using logistic regression.
         Args : 
         x = input matrix of the training set (N,D) where N is the number of samples and D the number of features
