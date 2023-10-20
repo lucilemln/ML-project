@@ -276,6 +276,18 @@ def compute_dist_array(x_featured_clean_1, column_index=None, values_to_remove =
 
     return dist
 
+def replace_nan_mean_column(X):
+    """takes as input the matrix with missing values and the column index, 
+      and returns the array of the distribution of the values in the column
+      use this function to replace missing values in the test data"""
+
+    #compute the mean of the column
+    mean = np.nanmean(X, axis = 0)
+
+    #replace all the NaN values by the mean
+    X = np.where(np.isnan(X), mean, X)
+
+    return X
 
 
 
