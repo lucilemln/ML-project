@@ -167,7 +167,7 @@ def logistic_regression(y, x, initial_w, max_iter, gamma):
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
     return w, loss
 
-def reg_logistic_regression(y, x, lambda_, max_iter, gamma, initial_w):
+def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
     """calculate the loss and the weights using regularized logistic regression.
         Args : 
         x = input matrix of the training set (N,D) where N is the number of samples and D the number of features
