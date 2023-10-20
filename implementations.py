@@ -98,7 +98,8 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         gamma = learning rate"""
     if max_iters < 1:
         raise ValueError("max_iters must be greater than 1.")
-    losses = []
+    losses = np.zeros(max_iters)
+    weights = np.zeros((max_iters, tx.shape[1]))
     w = initial_w
 
     for n_iter in range(max_iters):
@@ -106,17 +107,18 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
             # compute gradient and loss
             grad = compute_stoch_gradient(y_batch, tx_batch, w)
             w = w - gamma * grad
+            weights[n_iter] = w
             loss = compute_mse(y_batch, tx_batch, w)
             # update w by gradient
             # store w and loss
-            losses.append(loss)
+            losses[n_iter] = loss
 
     print(
         "SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]
         )
     )
-    return w, loss
+    return weights, losses
 
 def least_squares(y, tx):
     """calculate the least squares solution."""
