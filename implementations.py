@@ -29,6 +29,8 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         initial_w = initial weights
         max_iters = maximum number of iterations
         gamma = learning rate"""
+    losses = np.zeros(max_iters)
+    weights = np.zeros((max_iters, tx.shape[1]))
     
     w = initial_w
     if max_iters < 1:
@@ -39,10 +41,12 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         for n_iter in range(max_iters):
             gradient = compute_gradient_mse(y, tx, w)
             w = w - gamma * gradient
+            weights[n_iter, :] = w
             loss = compute_mse(y, tx, w)
-        print("Gradient Descent({bi}/{ti}): loss={l}".format(
+            losses[n_iter] = loss
+        print("Gradient Descent({bi}/{ti}): Final loss={l}".format(
                 bi=n_iter, ti=max_iters, l=loss))
-    return w, loss
+    return weights, losses
 
 def standardize(x):
     """Standardize the original data set."""
