@@ -138,13 +138,13 @@ def sigmoid(t):
 def compute_loss_logistic(y, tx, w):
     """compute the loss for y in [-1, 1]: negative log likelihood."""
     pred = tx.dot(w)
-    loss = 1/len(y)*np.sum(np.log(1 + np.exp(-y*pred)))
+    loss = np.sum(np.log(1 + np.exp(pred)) - y * pred)
     return loss
 
 def compute_gradient_logistic(y, tx, w):
     """compute the gradient of loss."""
     pred = tx.dot(w)
-    gradient = tx.T.dot(sigmoid(pred))/len(y)
+    gradient = tx.T.dot(sigmoid(pred) - y)/len(y)
     return gradient
     
 def logistic_regression(y, x, initial_w, max_iter, gamma):
