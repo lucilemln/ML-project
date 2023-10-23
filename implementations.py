@@ -56,13 +56,6 @@ def standardize(x):
     x = x / std_x
     return x, mean_x, std_x
 
-def compute_y_test(x_test, w):
-    """compute the output vector y_test"""
-    y_test = x_test.dot(w)
-    y_test_abs_rounded = np.where(np.abs(y_test) > 0, 1, -1)
-    print("the number of ones in y_test is", 100*np.sum(y_test_abs_rounded == 1)/len(y_test_abs_rounded), ' %')
-    return y_test
-
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """Generate a minibatch iterator for a dataset."""
     data_size = len(y)
@@ -194,92 +187,6 @@ def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
     return w, loss
 
-
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold.
-
-    Args:
-        y:      shape=(N,)
-        k_fold: K in K-fold, i.e. the fold num
-        seed:   the random seed
-
-    Returns:
-        A 2D array of shape=(k_fold, N/k_fold) that indicates the data indices for each fold
-
-    >>> build_k_indices(np.array([1., 2., 3., 4.]), 2, 1)
-    array([[3, 2],
-           [0, 1]])
-    """
-    num_row = y.shape[0]
-    interval = int(num_row / k_fold)
-    np.random.seed(seed)
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
-
-def cross_validation_gradient_descent(y, x, max_iters, k_indices, k):
-    """find the best initial_w for gradient descent over a k-fold cross-validation"""
-    # get k'th subgroup in test, others in train
-    test_indices = k_indices[k]
-    train_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)].flatten()
-    x_test = x[test_indices, :]
-    y_test = y[test_indices]
-    x_train = x[train_indices, :]
-    y_train = y[train_indices]
-    # form data with polynomial degree
-    #x_train = build_poly(x_train, degree)
-    #x_test = build_poly(x_test, degree)
-    # ridge regression
-    initial_w = np.random.choice([-1,1], size=(22,))
-    w, loss = mean_squared_error_gd(y_train, x_train, initial_w, max_iters=max_iters, gamma=0.01)
-    # calculate the loss for train and test data
-    loss_tr = compute_mse(y_train, x_train, w)
-    loss_te = compute_mse(y_test, x_test, w)
-    return loss_tr, loss_te, w
-
-#I want ot test the initial weights on the accuracy of the prediction using cross validation, based on the proportion between ones and minus ones in the init weights 
-# and plot the accuracy as a function of this proportion
-
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold.
-
-    Args:
-        y:      shape=(N,)
-        k_fold: K in K-fold, i.e. the fold num
-        seed:   the random seed
-
-    Returns:
-        A 2D array of shape=(k_fold, N/k_fold) that indicates the data indices for each fold
-
-    >>> build_k_indices(np.array([1., 2., 3., 4.]), 2, 1)
-    array([[3, 2],
-           [0, 1]])
-    """
-    num_row = y.shape[0]
-    interval = int(num_row / k_fold)
-    np.random.seed(seed)
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
-
-def cross_validation_accuracy(y, x, initial_w, k_indices, k):
-    """find the best initial_w for gradient descent over a k-fold cross-validation"""
-    # get k'th subgroup in test, others in train
-    test_indices = k_indices[k]
-    train_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)].flatten()
-    x_test = x[test_indices, :]
-    y_test = y[test_indices]
-    x_train = x[train_indices, :]
-    y_train = y[train_indices]
-    # form data with polynomial degree
-    #x_train = build_poly(x_train, degree)
-    #x_test = build_poly(x_test, degree)
-    # ridge regression
-    w, loss = mean_squared_error_gd(y_train, x_train, initial_w, max_iters=50, gamma=0.01)
-    # calculate the loss for train and test data
-    y_test_pred = compute_y_test(x_test, w)
-    accuracy = np.sum(y_test_pred == y_test)/len(y_test)
-    return accuracy, w
 
 
 def confusion_matrix(y_test, y_pred):
