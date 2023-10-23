@@ -54,7 +54,7 @@ def standardize(x):
     x = x - mean_x
     std_x = np.std(x, axis=0)
     x = x / std_x
-    return x, mean_x, std_x
+    return x
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """Generate a minibatch iterator for a dataset."""
@@ -188,7 +188,6 @@ def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
     return w, loss
 
 
-
 def confusion_matrix(y_test, y_pred):
     """compute the confusion matrix"""
     TP = np.sum(np.logical_and(y_pred == 1, y_test == 1))
@@ -198,6 +197,42 @@ def confusion_matrix(y_test, y_pred):
 
     f1_score = 2*TP/(2*TP + FP + FN)
     return TP, TN, FP, FN, f1_score
+
+def masking(X, features_name, features_list):
+     #INPUT: X = (x_train, x_test), features_list: features wanted
+
+    #Create a mask to filter the data
+    mask = np.isin(features_name, features_list)
+    x_train, x_test = X
+
+    x_train_featured = x_train[:, mask]
+    x_test_featured = x_test[:, mask]
+    
+    return x_train_featured, x_test_featured
+
+#remove all missing values on X and remove corresponding lines in Y and ids
+def cleanMissingValues(X): 
+    x, y, ids = X
+    x_clean = x[~np.isnan(x).any(axis=1)]
+    #x_test_featured_clean = x_test_featured[~np.isnan(x_test_featured).any(axis=1)]
+
+    y_clean = y[~np.isnan(x).any(axis=1)]
+
+    ids_clean = ids[~np.isnan(x).any(axis=1)]
+    #test_ids_filtered = test_ids[~np.isnan(x_test_featured).any(axis=1)]
+    
+    return x_clean, y_clean, ids_clean
+
+### Replace missing values by the mean of the column for the training features
+def replaceMissingValuesMean(X):
+    #compute the mean of the column
+    mean = np.nanmean(X, axis = 0)
+
+    #replace all the NaN values by the mean
+    X = np.where(np.isnan(X), mean, X)
+
+    return X
+
 
 
 
