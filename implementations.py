@@ -1,6 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
+    """Generate a minibatch iterator for a dataset."""
+    data_size = len(y)
+    indices = np.arange(data_size)
+    if shuffle:
+        np.random.shuffle(indices)
+    for batch_num in range(num_batches):
+        start_index = batch_num * batch_size
+        end_index = min((batch_num + 1) * batch_size, data_size)
+        if start_index != end_index:
+            batch_indices = indices[start_index:end_index]
+            yield y[batch_indices], tx[batch_indices]
+
 def compute_mse(y, tx, w):
     """compute the loss with MSE.
     Args:
@@ -21,6 +34,40 @@ def compute_gradient_mse(y, tx, w):
     e = y - tx.dot(w)
     grad =-1/(len(y)) * tx.T.dot(e)
     return grad
+
+def compute_stoch_gradient(y, tx, w):
+    """Compute a stochastic gradient at w from a data sample batch of size B, where B < N, and their corresponding labels.
+    Args:
+        y: numpy array of shape=(B, )
+        tx: numpy array of shape=(B,2)
+        w: numpy array of shape=(2, ). The vector of model parameters.
+    Returns:
+        A numpy array of shape (2, ) (same shape as w), containing the stochastic gradient of the loss at w.
+    """
+    e = y - tx.dot(w)
+    grad = -tx.T.dot(e) / len(y)
+    return grad
+
+def compute_loss_logistic(y, tx, w):
+    """compute the loss for y in [-1, 1]: negative log likelihood."""
+    pred = tx.dot(w)
+    loss = np.sum(np.log(1 + np.exp(pred)) - y * pred)/len(y)
+    return loss
+
+def compute_gradient_logistic(y, tx, w):
+    """compute the gradient of loss."""
+    pred = tx.dot(w)
+    gradient = tx.T.dot(sigmoid(pred) - y)/len(y)
+    return gradient
+
+
+def least_squares(y, tx):
+    """calculate the least squares solution."""
+    a = tx.T.dot(tx)
+    b = tx.T.dot(y)
+    w = np.linalg.solve(a, b)
+    loss = compute_mse(y, tx, w)
+    return w, loss
 
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """ gradient descent algorithm using mean squared error as the loss function 
@@ -48,46 +95,6 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
                 bi=n_iter, ti=max_iters, l=loss))
     return weights, losses
 
-def standardize(x):
-    """Standardize the original data set."""
-    mean_x = np.mean(x, axis=0)
-    x = x - mean_x
-    std_x = np.std(x, axis=0)
-    x = x / std_x
-    return x, mean_x, std_x
-
-def compute_y_test(x_test, w):
-    """compute the output vector y_test"""
-    y_test = x_test.dot(w)
-    y_test_abs_rounded = np.where(np.abs(y_test) > 0, 1, -1)
-    print("the number of ones in y_test is", 100*np.sum(y_test_abs_rounded == 1)/len(y_test_abs_rounded), ' %')
-    return y_test
-
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    """Generate a minibatch iterator for a dataset."""
-    data_size = len(y)
-    indices = np.arange(data_size)
-    if shuffle:
-        np.random.shuffle(indices)
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            batch_indices = indices[start_index:end_index]
-            yield y[batch_indices], tx[batch_indices]
-
-def compute_stoch_gradient(y, tx, w):
-    """Compute a stochastic gradient at w from a data sample batch of size B, where B < N, and their corresponding labels.
-    Args:
-        y: numpy array of shape=(B, )
-        tx: numpy array of shape=(B,2)
-        w: numpy array of shape=(2, ). The vector of model parameters.
-    Returns:
-        A numpy array of shape (2, ) (same shape as w), containing the stochastic gradient of the loss at w.
-    """
-    e = y - tx.dot(w)
-    grad = -tx.T.dot(e) / len(y)
-    return grad
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """ stochastic gradient descent algorithm using mean squared error as the loss function 
@@ -120,13 +127,6 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     )
     return weights, losses
 
-def least_squares(y, tx):
-    """calculate the least squares solution."""
-    a = tx.T.dot(tx)
-    b = tx.T.dot(y)
-    w = np.linalg.solve(a, b)
-    loss = compute_mse(y, tx, w)
-    return w, loss
 
 def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""
@@ -141,17 +141,14 @@ def sigmoid(t):
     """apply sigmoid function on t."""
     return np.exp(t)/ (1 + np.exp(t))
 
-def compute_loss_logistic(y, tx, w):
-    """compute the loss for y in [-1, 1]: negative log likelihood."""
-    pred = tx.dot(w)
-    loss = np.sum(np.log(1 + np.exp(pred)) - y * pred)/len(y)
-    return loss
+def standardize(x):
+    """Standardize the original data set."""
+    mean_x = np.mean(x, axis=0)
+    x = x - mean_x
+    std_x = np.std(x, axis=0)
+    x = x / std_x
+    return x
 
-def compute_gradient_logistic(y, tx, w):
-    """compute the gradient of loss."""
-    pred = tx.dot(w)
-    gradient = tx.T.dot(sigmoid(pred) - y)/len(y)
-    return gradient
     
 def logistic_regression(y, x, initial_w, max_iter, gamma):
     """calculate the loss and the weights using logistic regression.
@@ -195,93 +192,6 @@ def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
     return w, loss
 
 
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold.
-
-    Args:
-        y:      shape=(N,)
-        k_fold: K in K-fold, i.e. the fold num
-        seed:   the random seed
-
-    Returns:
-        A 2D array of shape=(k_fold, N/k_fold) that indicates the data indices for each fold
-
-    >>> build_k_indices(np.array([1., 2., 3., 4.]), 2, 1)
-    array([[3, 2],
-           [0, 1]])
-    """
-    num_row = y.shape[0]
-    interval = int(num_row / k_fold)
-    np.random.seed(seed)
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
-
-def cross_validation_gradient_descent(y, x, max_iters, k_indices, k):
-    """find the best initial_w for gradient descent over a k-fold cross-validation"""
-    # get k'th subgroup in test, others in train
-    test_indices = k_indices[k]
-    train_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)].flatten()
-    x_test = x[test_indices, :]
-    y_test = y[test_indices]
-    x_train = x[train_indices, :]
-    y_train = y[train_indices]
-    # form data with polynomial degree
-    #x_train = build_poly(x_train, degree)
-    #x_test = build_poly(x_test, degree)
-    # ridge regression
-    initial_w = np.random.choice([-1,1], size=(22,))
-    w, loss = mean_squared_error_gd(y_train, x_train, initial_w, max_iters=max_iters, gamma=0.01)
-    # calculate the loss for train and test data
-    loss_tr = compute_mse(y_train, x_train, w)
-    loss_te = compute_mse(y_test, x_test, w)
-    return loss_tr, loss_te, w
-
-#I want ot test the initial weights on the accuracy of the prediction using cross validation, based on the proportion between ones and minus ones in the init weights 
-# and plot the accuracy as a function of this proportion
-
-def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold.
-
-    Args:
-        y:      shape=(N,)
-        k_fold: K in K-fold, i.e. the fold num
-        seed:   the random seed
-
-    Returns:
-        A 2D array of shape=(k_fold, N/k_fold) that indicates the data indices for each fold
-
-    >>> build_k_indices(np.array([1., 2., 3., 4.]), 2, 1)
-    array([[3, 2],
-           [0, 1]])
-    """
-    num_row = y.shape[0]
-    interval = int(num_row / k_fold)
-    np.random.seed(seed)
-    indices = np.random.permutation(num_row)
-    k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
-    return np.array(k_indices)
-
-def cross_validation_accuracy(y, x, initial_w, k_indices, k):
-    """find the best initial_w for gradient descent over a k-fold cross-validation"""
-    # get k'th subgroup in test, others in train
-    test_indices = k_indices[k]
-    train_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)].flatten()
-    x_test = x[test_indices, :]
-    y_test = y[test_indices]
-    x_train = x[train_indices, :]
-    y_train = y[train_indices]
-    # form data with polynomial degree
-    #x_train = build_poly(x_train, degree)
-    #x_test = build_poly(x_test, degree)
-    # ridge regression
-    w, loss = mean_squared_error_gd(y_train, x_train, initial_w, max_iters=50, gamma=0.01)
-    # calculate the loss for train and test data
-    y_test_pred = compute_y_test(x_test, w)
-    accuracy = np.sum(y_test_pred == y_test)/len(y_test)
-    return accuracy, w
-
-
 def confusion_matrix(y_test, y_pred):
     """compute the confusion matrix"""
     TP = np.sum(np.logical_and(y_pred == 1, y_test == 1))
@@ -291,6 +201,44 @@ def confusion_matrix(y_test, y_pred):
 
     f1_score = 2*TP/(2*TP + FP + FN)
     return TP, TN, FP, FN, f1_score
+
+def masking(X, features_name, features_list):
+     #INPUT: X = (x_train, x_test), features_list: features wanted
+
+    #Create a mask to filter the data
+    mask = np.isin(features_name, features_list)
+    x_train, x_test = X
+
+    x_train_featured = x_train[:, mask]
+    x_test_featured = x_test[:, mask]
+    print("yo")
+    print(len(x_train_featured))
+    
+    return x_train_featured, x_test_featured
+
+#remove all missing values on X and remove corresponding lines in Y and ids
+def cleanMissingValues(X): 
+    x, y, ids = X
+    x_clean = x[~np.isnan(x).any(axis=1)]
+    #x_test_featured_clean = x_test_featured[~np.isnan(x_test_featured).any(axis=1)]
+
+    y_clean = y[~np.isnan(x).any(axis=1)]
+
+    ids_clean = ids[~np.isnan(x).any(axis=1)]
+    #test_ids_filtered = test_ids[~np.isnan(x_test_featured).any(axis=1)]
+    
+    return x_clean, y_clean, ids_clean
+
+### Replace missing values by the mean of the column for the training features
+def replaceMissingValuesMean(X):
+    #compute the mean of the column
+    mean = np.nanmean(X, axis = 0)
+
+    #replace all the NaN values by the mean
+    X = np.where(np.isnan(X), mean, X)
+
+    return X
+
 
 
 
