@@ -86,11 +86,14 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
                 bi=0, ti=0, l=loss))
     else:
         for n_iter in range(max_iters):
+
             gradient = compute_gradient_mse(y, tx, w)
             w = w - gamma * gradient
             weights[n_iter, :] = w
             loss = compute_mse(y, tx, w)
             losses[n_iter] = loss
+            if loss > 10000:
+                break
         print("Gradient Descent({bi}/{ti}): Final loss={l}".format(
                 bi=n_iter, ti=max_iters, l=loss))
     return weights, losses
@@ -162,13 +165,17 @@ def logistic_regression(y, x, initial_w, max_iter, gamma):
         loss = loss of the logistic regression
         w = weights of the logistic regression"""
     w = initial_w
+    losses = np.zeros(max_iter)
+    weights = np.zeros((max_iter, x.shape[1]))
     for n_iter in range(max_iter):
         gradient = compute_gradient_logistic(y, x, w)
         w = w - gamma * gradient
+        weights[n_iter] = w
         loss = compute_loss_logistic(y, x, w)
-        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+        losses[n_iter] = loss
+    print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
             bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
-    return w, loss
+    return weights, losses
 
 def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
     """calculate the loss and the weights using regularized logistic regression.

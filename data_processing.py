@@ -1,5 +1,25 @@
 import numpy as np
 
+
+def replaceMissingValuesMean(X):
+    #compute the mean of the column
+    mean = np.nanmean(X, axis = 0)
+
+    #replace all the NaN values by the mean
+    X = np.where(np.isnan(X), mean, X)
+
+    return X
+
+def masking(X, features_name, features_list):
+    """takes as input the matrix of the features and the list of the features to keep
+    and returns the matrix with the features to keep"""
+    #create a mask of the features to keep
+    mask = np.isin(features_name, features_list)
+
+    #apply the mask to the matrix
+    X = X[:, mask]
+    return X
+
 def feature_processing(x_featured_clean_1, y_clean, ids):
     """takes as input the matrix with no missing values and the output vector (also with rows removed) and returns the matrix with the features processed)"""
 
