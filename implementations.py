@@ -86,14 +86,13 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
                 bi=0, ti=0, l=loss))
     else:
         for n_iter in range(max_iters):
-
             gradient = compute_gradient_mse(y, tx, w)
             w = w - gamma * gradient
             weights[n_iter, :] = w
             loss = compute_mse(y, tx, w)
             losses[n_iter] = loss
-            if loss > 10000:
-                break
+            #if loss > 10000:
+                #break
         print("Gradient Descent({bi}/{ti}): Final loss={l}".format(
                 bi=n_iter, ti=max_iters, l=loss))
     return weights, losses
