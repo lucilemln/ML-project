@@ -124,8 +124,7 @@ def masking(X, features_name, features_list):
 
     x_train_featured = x_train[:, mask]
     x_test_featured = x_test[:, mask]
-    print("yo")
-    print(len(x_train_featured))
+
     
     return x_train_featured, x_test_featured
 
