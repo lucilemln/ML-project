@@ -1,6 +1,6 @@
 # Heart Disease Prediction using Machine Learning
 ## Introduction
-This project aims to predict the risk of coronary heart disease (MICHD) using various machine learning models. Utilizing data from the Behavioral Risk Factor Surveillance System (BRFSS), we focus on lifestyle and clinical factors to implement binary classification techniques. The outcome is intended to support public health initiatives in promoting healthier lifestyle choices and facilitating early interventions to combat heart-related diseases.
+This project aims to predict the risk of coronary heart disease (MICHD) using various machine learning models. Utilizing data from the Behavioral Risk Factor Surveillance System (BRFSS) survey from 2015, we focus on lifestyle and clinical factors to implement binary classification techniques like gradient descent or ligistic regression. The outcome is intended to support public health initiatives in promoting healthier lifestyle choices and facilitating early interventions to combat heart-related diseases.
 ## Table of Contents
 * [Getting Started](#getting-started)
 * [Usage](#usage)
