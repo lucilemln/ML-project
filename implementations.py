@@ -153,7 +153,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
             #if loss > 10000:
                 #break
         print("Gradient Descent({bi}/{ti}): Final loss={l}".format(
-                bi=n_iter, ti=max_iters, l=loss))
+                bi=n_iter + 1, ti=max_iters, l=loss))
     return weights, losses
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
@@ -181,8 +181,8 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
             losses[n_iter] = loss
 
     print(
-        "SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-            bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]
+        "SGD iter. {bi}/{ti}: loss={l}".format(
+            bi=n_iter, ti=max_iters - 1, l=loss
         )
     )
     return weights, losses
