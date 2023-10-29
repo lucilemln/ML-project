@@ -5,7 +5,6 @@ This project aims to predict the risk of coronary heart disease (MICHD) using va
 * [Getting Started](#getting-started)
 * [Usage](#usage)
 * [Models Implemented](#models-implemented)
-* [Contact](#contact)
 
 ## Getting Started
 ### Prerequisites
@@ -27,4 +26,3 @@ In this project, we have implemented and assessed the performance of the followi
 - Logistic Regression
 - Regularized Logistic Regression
 
-## Contact
