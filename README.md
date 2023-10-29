@@ -12,7 +12,8 @@ This project aims to predict the risk of coronary heart disease (MICHD) using va
 - Libraries: numpy, matplotlib
   
 ## Usage
-Clone the repository: ****
+Clone the Repository: Clone this repository to your local machine using the following command:
+git clone 
 Download the folder data
 The project folder need to be one level above the project folder and name data
    
