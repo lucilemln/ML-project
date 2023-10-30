@@ -207,8 +207,8 @@ def reg_logistic_regression(y, x, lambda_, initial_w, max_iter, gamma):
         weights[n_iter,:] = w
         loss = compute_loss_logistic(y, x, w)
         losses[n_iter] = loss
-        #print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
-        #    bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
+    print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+            bi=n_iter, ti=max_iter - 1, l=loss, w0=w[0], w1=w[1]))
     return weights, losses
 
 ### Replace missing values by the mean of the column for the training features
